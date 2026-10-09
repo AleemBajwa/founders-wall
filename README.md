@@ -1,69 +1,80 @@
-# The 500 Founders Wall (FoundersWall.io)
+# The 500 Founders Wall
 
-> A modern, gamified homage to the 2005 Million Dollar Homepage for internet makers, indie hackers, and startups.
+> **Live Production App:** [https://founders-wall.vercel.app](https://founders-wall.vercel.app)  
+> *An interactive 500-slot archival mosaic and permanent internet directory for builders, indie hackers, and founders.*
 
----
-
-## 🌟 Key Features
-
-1. **100% Crisp Light Mode:** High-contrast, clean Apple/Stripe-inspired aesthetic with subtle borders and shadows.
-2. **The Ramping Price Protocol:**
-   - **Slots 1–10:** Free Early Birds (Pre-seeded with 10 inspiring projects).
-   - **Slots 11–25:** $2.00 (Tier 1: Impulse).
-   - **Slots 26–50:** $5.00 (Tier 2: The Spark).
-   - **Slots 51–100:** $10.00 (Tier 3: The Ascent).
-   - **Slots 101–250:** $20.00 (Tier 4: Proven Ground).
-   - **Slots 251–500:** $40.00 (Tier 5: The Finale).
-3. **SEO Dofollow Links:** Every project receives a permanent HTML backlink for domain authority.
-4. **Live Interactive Mosaic Grid:** Real-time search by founder/project name, status filtering (Claimed/Available), and category tags (AI, SaaS, DevTool, Design, Newsletter).
-5. **Instant Live Preview & Confetti:** Users see their card live before claiming, with celebration confetti on lock-in.
-6. **Viral X / Twitter Share Flow:** Pre-filled brag tweets for new founders to drive organic viral traffic on launch day.
+[![Live Site](https://img.shields.io/badge/Live-Founders%20Wall-2563eb?style=for-the-badge&logo=vercel)](https://founders-wall.vercel.app)
+[![Built with Next.js](https://img.shields.io/badge/Next.js-16.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![Database](https://img.shields.io/badge/PostgreSQL-Neon%20Serverless-00E599?style=for-the-badge&logo=postgresql)](https://neon.tech/)
 
 ---
 
-## 🚀 Quick Start (Local)
+## 🌟 Overview
 
-The server is already compiled and tested:
+**The 500 Founders Wall** is a modern, high-performance archival monument honoring early internet history (inspired by the 2005 Million Dollar Homepage) redesigned for today's indie makers, bootstrappers, and startup founders.
+
+Instead of bloated subscription directories or infinite algorithmic feeds, it provides **500 permanent positions** on an interactive, zero-scroll Swiss-minimalist mosaic.
+
+### Key Pillars
+- **Zero-Scroll Single Canvas:** Fixed `100dvh` responsive viewport with crisp typography and subtle micro-interactions.
+- **Algorithmic Bonding Price Curve:** 
+  - **Slots 1–10:** **Genesis Free ($0.00)** for early grassroots indie hackers.
+  - **Slots 11–25:** $2.00 (Tier 1: Impulse).
+  - **Slots 26–50:** $5.00 (Tier 2: The Spark).
+  - **Slots 51–100:** $10.00 (Tier 3: The Ascent).
+  - **Slots 101–250:** $20.00 (Tier 4: Proven Ground).
+  - **Slots 251–500:** $40.00 (Tier 5: The Finale).
+- **SEO & Permanent Backlinks:** Every claimed slot receives a high-authority dofollow link, permanent brand logo placement, and indexing across dedicated category vertical hubs.
+- **Structured Data:** Full Schema.org JSON-LD integration (`WebSite`, `Organization`, `FAQPage`, `ItemList`).
+
+---
+
+## 🧭 Pages & Site Structure
+
+- **Main Mosaic:** [founders-wall.vercel.app](https://founders-wall.vercel.app) — Real-time interactive 500-slot grid.
+- **Directory Index:** [founders-wall.vercel.app/directory](https://founders-wall.vercel.app/directory) — Full searchable table of all claimed slots.
+- **Protocol & Pricing:** [founders-wall.vercel.app/how-it-works](https://founders-wall.vercel.app/how-it-works) — Transparent tier breakdown and bonding curve formula.
+- **The Manifesto:** [founders-wall.vercel.app/about](https://founders-wall.vercel.app/about) — Archival thesis and community moderation standards.
+- **Category Hubs:**
+  - [AI Startups & Tools](https://founders-wall.vercel.app/category/ai)
+  - [Developer Tools](https://founders-wall.vercel.app/category/devtools)
+  - [SaaS Products](https://founders-wall.vercel.app/category/saas)
+  - [Productivity Tools](https://founders-wall.vercel.app/category/productivity)
+  - [Cloud Infrastructure](https://founders-wall.vercel.app/category/infrastructure)
+  - [Other Ventures](https://founders-wall.vercel.app/category/other)
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 16 (App Router, Turbopack, React 19)
+- **Styling:** Tailwind CSS v4 with custom warm-paper Swiss minimalist aesthetic (`#fafaf9`)
+- **Database:** Serverless PostgreSQL (`@neondatabase/serverless`)
+- **Analytics & Tracking:** Google Analytics 4 (`gtag.js`)
+- **Search Verification:** Google Search Console (`sitemap.xml`, `robots.txt`)
+- **Hosting:** Vercel Global Edge Network
+
+---
+
+## 🚀 Local Development
 
 ```bash
-cd D:\NewIdeas\founders-wall
+# 1. Clone the repository
+git clone https://github.com/AleemBajwa/founders-wall.git
+cd founders-wall
+
+# 2. Install dependencies
+npm install
+
+# 3. Run development server
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ---
 
-## 🌐 Deploy to Vercel (Under 60 Seconds)
+## 📄 License & Attribution
 
-### Option A: Using the Vercel CLI (Fastest)
-
-```bash
-cd D:\NewIdeas\founders-wall
-npx vercel
-```
-Follow the 3 prompts and your site will be live instantly with a free `.vercel.app` domain and SSL.
-
-### Option B: Using GitHub & Vercel Dashboard
-
-1. Push this folder to a GitHub repository:
-   ```bash
-   git add .
-   git commit -m "feat: initial commit of The 500 Founders Wall"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/founders-wall.git
-   git push -u origin main
-   ```
-2. Go to [vercel.com/new](https://vercel.com/new) and click **Import**.
-3. Click **Deploy**. Vercel will automatically build and deploy the site globally on its Edge Network!
-
----
-
-## 💳 Connecting Real Stripe Payments (Optional)
-
-In this version, claiming a slot simulates the instant lock-in with confetti and saves directly to local storage/state so you can test and demonstrate it immediately.
-
-To enable real Stripe credit card / Apple Pay processing for Slots 11+:
-1. Create a Stripe account at [stripe.com](https://stripe.com).
-2. Create standard Stripe Checkout products for each price tier ($2, $5, $10, $20, $40).
-3. Connect the checkout redirect in `src/components/ClaimModal.tsx`.
+Created by **Aleem Bajwa** & internet builders worldwide. Released under the MIT License.
