@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The 500 Founders Wall (FoundersWall.io)
 
-## Getting Started
+> A modern, gamified homage to the 2005 Million Dollar Homepage for internet makers, indie hackers, and startups.
 
-First, run the development server:
+---
+
+## 🌟 Key Features
+
+1. **100% Crisp Light Mode:** High-contrast, clean Apple/Stripe-inspired aesthetic with subtle borders and shadows.
+2. **The Ramping Price Protocol:**
+   - **Slots 1–10:** Free Early Birds (Pre-seeded with 10 inspiring projects).
+   - **Slots 11–25:** $2.00 (Tier 1: Impulse).
+   - **Slots 26–50:** $5.00 (Tier 2: The Spark).
+   - **Slots 51–100:** $10.00 (Tier 3: The Ascent).
+   - **Slots 101–250:** $20.00 (Tier 4: Proven Ground).
+   - **Slots 251–500:** $40.00 (Tier 5: The Finale).
+3. **SEO Dofollow Links:** Every project receives a permanent HTML backlink for domain authority.
+4. **Live Interactive Mosaic Grid:** Real-time search by founder/project name, status filtering (Claimed/Available), and category tags (AI, SaaS, DevTool, Design, Newsletter).
+5. **Instant Live Preview & Confetti:** Users see their card live before claiming, with celebration confetti on lock-in.
+6. **Viral X / Twitter Share Flow:** Pre-filled brag tweets for new founders to drive organic viral traffic on launch day.
+
+---
+
+## 🚀 Quick Start (Local)
+
+The server is already compiled and tested:
 
 ```bash
+cd D:\NewIdeas\founders-wall
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌐 Deploy to Vercel (Under 60 Seconds)
 
-## Learn More
+### Option A: Using the Vercel CLI (Fastest)
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cd D:\NewIdeas\founders-wall
+npx vercel
+```
+Follow the 3 prompts and your site will be live instantly with a free `.vercel.app` domain and SSL.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Option B: Using GitHub & Vercel Dashboard
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Push this folder to a GitHub repository:
+   ```bash
+   git add .
+   git commit -m "feat: initial commit of The 500 Founders Wall"
+   git branch -M main
+   git remote add origin https://github.com/<your-username>/founders-wall.git
+   git push -u origin main
+   ```
+2. Go to [vercel.com/new](https://vercel.com/new) and click **Import**.
+3. Click **Deploy**. Vercel will automatically build and deploy the site globally on its Edge Network!
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 💳 Connecting Real Stripe Payments (Optional)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+In this version, claiming a slot simulates the instant lock-in with confetti and saves directly to local storage/state so you can test and demonstrate it immediately.
+
+To enable real Stripe credit card / Apple Pay processing for Slots 11+:
+1. Create a Stripe account at [stripe.com](https://stripe.com).
+2. Create standard Stripe Checkout products for each price tier ($2, $5, $10, $20, $40).
+3. Connect the checkout redirect in `src/components/ClaimModal.tsx`.
