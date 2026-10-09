@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = claimSlotAuthoritative(formData, targetSlotId);
+    const result = await claimSlotAuthoritative(formData, targetSlotId);
 
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {

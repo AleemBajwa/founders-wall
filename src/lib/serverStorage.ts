@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { neon } from "@neondatabase/serverless";
 import { Slot, ClaimFormData, Category } from "@/types";
 import { generateAllSlots } from "@/data/initialSlots";
 import { getSlotPrice, getCurrentTier, formatSlotId } from "@/utils/pricing";
@@ -18,19 +19,60 @@ const VALID_CATEGORIES: Category[] = [
   "Other",
 ];
 
-// In-memory cache for serverless container reuse
+// Helper to get Postgres client if DATABASE_URL or POSTGRES_URL is configured
+function getDb() {
+  const connString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (!connString) return null;
+  return neon(connString);
+}
+
+let isTableInitialized = false;
+
+async function ensureTable(sql: any) {
+  if (isTableInitialized) return;
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS claims (
+        id INT PRIMARY KEY,
+        data JSONB NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `;
+    isTableInitialized = true;
+  } catch (err) {
+    console.error("Failed to verify/create claims table:", err);
+  }
+}
+
+// In-memory cache for fast reads and serverless container reuse
 let memoryClaimsCache: Slot[] | null = null;
 
 /**
- * Reads confirmed user claims persisted on the server
+ * Reads confirmed user claims persisted in Cloud Postgres or local disk fallback
  */
-export function getServerClaims(): Slot[] {
+export async function getServerClaims(): Promise<Slot[]> {
+  const sql = getDb();
+
+  // 1. If Cloud Postgres is configured, query database directly
+  if (sql) {
+    try {
+      await ensureTable(sql);
+      const rows = await sql`SELECT data FROM claims ORDER BY id ASC;`;
+      const claims: Slot[] = rows.map((r: any) => r.data as Slot);
+      memoryClaimsCache = claims;
+      return claims;
+    } catch (err) {
+      console.error("Error reading claims from Postgres, falling back to local cache:", err);
+    }
+  }
+
+  // 2. In-memory cache fallback
   if (memoryClaimsCache && memoryClaimsCache.length > 0) {
     return memoryClaimsCache;
   }
 
+  // 3. Fallback to local files (tmpdir or repo claims.json)
   try {
-    // 1. Check writable tmpdir first (updated during serverless runtime)
     if (fs.existsSync(TMP_CLAIMS_FILE)) {
       const raw = fs.readFileSync(TMP_CLAIMS_FILE, "utf-8");
       const parsed = JSON.parse(raw);
@@ -40,7 +82,6 @@ export function getServerClaims(): Slot[] {
       }
     }
 
-    // 2. Check bundled local repo file
     if (fs.existsSync(LOCAL_CLAIMS_FILE)) {
       const raw = fs.readFileSync(LOCAL_CLAIMS_FILE, "utf-8");
       const parsed = JSON.parse(raw);
@@ -50,38 +91,62 @@ export function getServerClaims(): Slot[] {
       }
     }
   } catch (error) {
-    console.error("Error reading claims:", error);
+    console.error("Error reading fallback claims:", error);
   }
+
   return [];
 }
 
 /**
- * Saves updated claims list with serverless-safe fallback
+ * Persists a new claim atomically into Cloud Postgres or fallback
  */
-function saveServerClaims(claims: Slot[]): void {
-  memoryClaimsCache = claims;
+async function saveServerClaim(newClaim: Slot): Promise<Slot[]> {
+  const sql = getDb();
 
-  // 1. Try local data dir (works in Node.js dev and stateful containers)
+  if (sql) {
+    try {
+      await ensureTable(sql);
+      await sql`
+        INSERT INTO claims (id, data)
+        VALUES (${newClaim.id}, ${JSON.stringify(newClaim)})
+        ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data;
+      `;
+      const rows = await sql`SELECT data FROM claims ORDER BY id ASC;`;
+      const updatedClaims: Slot[] = rows.map((r: any) => r.data as Slot);
+      memoryClaimsCache = updatedClaims;
+      return updatedClaims;
+    } catch (err) {
+      console.error("Error persisting claim to Postgres:", err);
+      throw new Error("Database transaction failed. Please retry.");
+    }
+  }
+
+  // Local fallback
+  const existing = await getServerClaims();
+  const updated = [...existing.filter((c) => c.id !== newClaim.id), newClaim];
+  memoryClaimsCache = updated;
+
   try {
     if (!fs.existsSync(LOCAL_DATA_DIR)) {
       fs.mkdirSync(LOCAL_DATA_DIR, { recursive: true });
     }
     const tmp = `${LOCAL_CLAIMS_FILE}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(claims, null, 2), "utf-8");
+    fs.writeFileSync(tmp, JSON.stringify(updated, null, 2), "utf-8");
     fs.renameSync(tmp, LOCAL_CLAIMS_FILE);
-    return;
+    return updated;
   } catch {
-    // Read-only filesystem in serverless environments (e.g. Vercel)
+    // Serverless read-only
   }
 
-  // 2. Fall back to os.tmpdir() which is always writable in serverless runtimes
   try {
     const tmp = `${TMP_CLAIMS_FILE}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(claims, null, 2), "utf-8");
+    fs.writeFileSync(tmp, JSON.stringify(updated, null, 2), "utf-8");
     fs.renameSync(tmp, TMP_CLAIMS_FILE);
   } catch (tmpErr) {
     console.error("Failed to persist claims to tmpdir:", tmpErr);
   }
+
+  return updated;
 }
 
 export interface AuthoritativeInventory {
@@ -96,11 +161,11 @@ export interface AuthoritativeInventory {
 }
 
 /**
- * Merges seed editorial positions with saved server claims to return the single source of truth.
+ * Merges seed positions with saved server claims to return the single source of truth.
  */
-export function getAllSlotsAuthoritative(): AuthoritativeInventory {
+export async function getAllSlotsAuthoritative(): Promise<AuthoritativeInventory> {
   const baseSlots = generateAllSlots();
-  const serverClaims = getServerClaims();
+  const serverClaims = await getServerClaims();
 
   const slotMap = new Map<number, Slot>();
   serverClaims.forEach((claim) => {
@@ -215,13 +280,13 @@ function validateClaimInput(data: ClaimFormData): void {
 /**
  * Atomically reserves, processes payment confirmation, and publishes a new slot claim on the server.
  */
-export function claimSlotAuthoritative(
+export async function claimSlotAuthoritative(
   data: ClaimFormData,
   targetSlotId?: number
-): { success: boolean; slot: Slot; inventory: AuthoritativeInventory } {
+): Promise<{ success: boolean; slot: Slot; inventory: AuthoritativeInventory }> {
   validateClaimInput(data);
 
-  const inventory = getAllSlotsAuthoritative();
+  const inventory = await getAllSlotsAuthoritative();
 
   if (inventory.isSoldOut || inventory.nextSlotId === null) {
     throw new Error("The Founders Wall is completely filled. No positions remain available.");
@@ -240,7 +305,7 @@ export function claimSlotAuthoritative(
     throw new Error("Invalid slot position. Must be between 1 and 500.");
   }
 
-  const existingClaims = getServerClaims();
+  const existingClaims = await getServerClaims();
   if (existingClaims.some((c) => c.id === slotIdToClaim)) {
     throw new Error(`Slot #${slotIdToClaim} has already been claimed by another builder.`);
   }
@@ -272,10 +337,9 @@ export function claimSlotAuthoritative(
         : `pay_sandbox_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
   };
 
-  const updatedClaims = [...existingClaims, newSlot];
-  saveServerClaims(updatedClaims);
+  await saveServerClaim(newSlot);
 
-  const updatedInventory = getAllSlotsAuthoritative();
+  const updatedInventory = await getAllSlotsAuthoritative();
 
   return {
     success: true,

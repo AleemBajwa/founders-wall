@@ -4,7 +4,7 @@ import { getAllSlotsAuthoritative } from "@/lib/serverStorage";
 export async function GET() {
   await connection();
   try {
-    const inventory = getAllSlotsAuthoritative();
+    const inventory = await getAllSlotsAuthoritative();
     return NextResponse.json(inventory, {
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
