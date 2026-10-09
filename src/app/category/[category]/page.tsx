@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
@@ -55,12 +55,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({
-  params,
-}: {
-  params: Promise<{ category: string }>;
-}) {
-  const { category } = await params;
+async function CategoryContent({ category }: { category: string }) {
   const config = CATEGORY_MAP[category.toLowerCase()];
 
   if (!config) {
@@ -225,5 +220,24 @@ export default async function CategoryPage({
         </div>
       </footer>
     </div>
+  );
+}
+
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ category: string }>;
+}) {
+  const { category } = await params;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#fafaf9] flex items-center justify-center font-mono text-xs text-stone-500">
+          Loading Category...
+        </div>
+      }
+    >
+      <CategoryContent category={category} />
+    </Suspense>
   );
 }
