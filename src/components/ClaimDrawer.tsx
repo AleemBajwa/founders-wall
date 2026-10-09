@@ -187,7 +187,7 @@ export function ClaimDrawer({
   };
 
   const canonicalUrl = typeof window !== "undefined" ? `${window.location.origin}/?slot=${slotId.toString().padStart(3, "0")}` : "";
-  const shareText = `Just claimed Slot ${formattedId} on The Founders Wall! 🚀`;
+  const shareText = `I just minted Slot ${formattedId} on The 500 Founders Wall! 🚀\n\nThe first 10 slots are 100% FREE ($0.00) before the price bonding curve climbs.\n\nGrab your permanent position:`;
   const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
     shareText
   )}&url=${encodeURIComponent(canonicalUrl)}`;
