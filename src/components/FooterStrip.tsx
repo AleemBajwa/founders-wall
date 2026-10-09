@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { ZoomIn, ZoomOut, RotateCcw, ListFilter, HelpCircle, Tag } from "lucide-react";
 
 interface FooterStripProps {
@@ -26,33 +27,33 @@ export function FooterStrip({
     <footer className="h-10 sm:h-11 shrink-0 border-t border-[#dad7d0] bg-[#fafaf9]/95 backdrop-blur-xs px-3 sm:px-6 flex items-center justify-between gap-3 text-xs font-mono text-stone-500 z-30 select-none">
       {/* Left Links */}
       <div className="flex items-center gap-3 sm:gap-5">
-        <button
-          onClick={onOpenHowItWorks}
-          className="hover:text-[#080503] flex items-center gap-1 transition-colors cursor-pointer"
+        <Link
+          href="/how-it-works"
+          className="hover:text-[#080503] flex items-center gap-1 transition-colors"
         >
           <Tag className="w-3 h-3 text-stone-400" />
           <span>Pricing & Rules</span>
-        </button>
+        </Link>
 
         <span className="text-stone-300">·</span>
 
-        <button
-          onClick={onOpenAboutPolicies}
-          className="hover:text-[#080503] flex items-center gap-1 transition-colors cursor-pointer"
+        <Link
+          href="/about"
+          className="hover:text-[#080503] flex items-center gap-1 transition-colors"
         >
           <HelpCircle className="w-3 h-3 text-stone-400" />
           <span>About & Policies</span>
-        </button>
+        </Link>
 
         <span className="text-stone-300">·</span>
 
-        <button
-          onClick={onOpenSearchList}
-          className="hover:text-[#080503] flex items-center gap-1 transition-colors cursor-pointer"
+        <Link
+          href="/directory"
+          className="hover:text-[#080503] flex items-center gap-1 transition-colors"
         >
           <ListFilter className="w-3 h-3 text-stone-400" />
-          <span>Browse List</span>
-        </button>
+          <span>Browse Directory</span>
+        </Link>
       </div>
 
       {/* Center Reassurance (Desktop only) */}

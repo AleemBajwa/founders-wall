@@ -177,6 +177,28 @@ export default function Home() {
 
       {/* 2. Single-Screen 500-Slot Wall (Fits 100% in viewport without scrolling) */}
       <main className="flex-1 min-h-0 min-w-0 w-full flex flex-col overflow-hidden relative">
+        {/* Semantic Crawlable Context for Search Engines & Screen Readers */}
+        <section className="sr-only">
+          <h1>The 500 Founders Wall — The Archival Directory of 500 Internet Builders</h1>
+          <p>
+            An archival mosaic and verified directory indexing 500 startups, indie hacker tools, and software products along an algorithmic bonding price curve. The first 10 slots (#001–#010) are 100% FREE ($0.00). Permanent dofollow backlinks, verified profiles, and zero recurring subscription fees.
+          </p>
+          <nav aria-label="Directory and category hubs">
+            <h2>Explore Directory and Categories</h2>
+            <ul>
+              <li><a href="/directory">Full 500 Startup Directory</a></li>
+              <li><a href="/how-it-works">How It Works & Bonding Curve Pricing</a></li>
+              <li><a href="/about">About & Editorial Guidelines</a></li>
+              <li><a href="/category/ai">AI Startups & Tools Directory</a></li>
+              <li><a href="/category/devtools">DevTools & Developer Infrastructure Directory</a></li>
+              <li><a href="/category/saas">SaaS & B2B Software Directory</a></li>
+              <li><a href="/category/productivity">Productivity Software Directory</a></li>
+              <li><a href="/category/infrastructure">Infrastructure & Cloud Platforms Directory</a></li>
+              <li><a href="/category/other">Creative Internet Experiments Directory</a></li>
+            </ul>
+          </nav>
+        </section>
+
         <SingleScreenWall
           slots={slots}
           activeCategory={activeCategory}

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Search, ArrowRight } from "lucide-react";
 
 interface HeaderProps {
@@ -42,13 +43,17 @@ export function Header({
     <header className="h-14 sm:h-16 shrink-0 border-b border-[#dad7d0] bg-[#fafaf9]/95 backdrop-blur-xs px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 z-30 w-full">
       {/* Brand & Subtitle (Never squished) */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
-        <a href="#" className="flex items-center gap-1.5 shrink-0">
+        <Link href="/" className="flex items-center gap-1.5 shrink-0 hover:opacity-85 transition-opacity">
           <span className="font-display tracking-tight text-lg sm:text-2xl text-[#080503] font-medium whitespace-nowrap">
             Founders Wall
           </span>
-        </a>
-        <div className="hidden lg:flex items-center gap-2 pl-3 border-l border-[#dad7d0] text-xs text-stone-500 font-sans truncate">
+        </Link>
+        <div className="hidden lg:flex items-center gap-3 pl-3 border-l border-[#dad7d0] text-xs text-stone-500 font-sans truncate">
           <span>A time capsule of 500 builders.</span>
+          <span className="text-stone-300">·</span>
+          <Link href="/directory" className="font-mono text-stone-700 hover:text-black font-medium underline underline-offset-2">
+            Directory
+          </Link>
         </div>
       </div>
 
