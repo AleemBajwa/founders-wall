@@ -238,11 +238,11 @@ export function SingleScreenWall({
                 </div>
               ) : nextSlotId !== null && hoveredSlot.id === nextSlotId ? (
                 <span className="text-emerald-700 font-bold truncate">
-                  Open for Claim · ${nextSlotPrice}.00 · Click to claim now
+                  Open for Claim · {nextSlotPrice === 0 ? "100% FREE ($0.00)" : `$${nextSlotPrice}.00`} · Click to claim now
                 </span>
               ) : (
                 <span className="text-stone-600 truncate">
-                  Future slot · {getCurrentTier(hoveredSlot.id).code} (${hoveredSlot.pricePaid}.00) · Sequential release
+                  Future slot · {getCurrentTier(hoveredSlot.id).code} ({hoveredSlot.pricePaid === 0 ? "Free" : `$${hoveredSlot.pricePaid}.00`}) · Sequential release
                 </span>
               )}
             </div>
@@ -256,10 +256,10 @@ export function SingleScreenWall({
               ) : (
                 <>
                   <span className="text-stone-600 truncate hidden sm:inline">
-                    Hover any logo or slot to inspect · 13 editorial examples · Slot #{nextSlotId} is active at ${nextSlotPrice}
+                    Hover any slot to inspect · First 10 slots are 100% FREE ($0.00) · Slot #{nextSlotId} is active
                   </span>
                   <span className="text-stone-600 truncate sm:hidden">
-                    Tap to inspect · Slot #{nextSlotId} active (${nextSlotPrice})
+                    Tap to inspect · Slot #{nextSlotId} active ({nextSlotPrice === 0 ? "FREE" : `$${nextSlotPrice}`})
                   </span>
                 </>
               )}
@@ -352,8 +352,8 @@ export function SingleScreenWall({
                   onMouseLeave={() => setHoveredSlot(null)}
                   onFocus={() => setHoveredSlot(slot)}
                   onBlur={() => setHoveredSlot(null)}
-                  title={`Slot #${slot.id} is available right now for $${slot.pricePaid}.00`}
-                  aria-label={`Slot #${slot.id} open for claim at $${slot.pricePaid}.00`}
+                  title={`Slot #${slot.id} is available right now for ${slot.pricePaid === 0 ? "FREE" : `$${slot.pricePaid}.00`}`}
+                  aria-label={`Slot #${slot.id} open for claim at ${slot.pricePaid === 0 ? "FREE" : `$${slot.pricePaid}.00`}`}
                   className={`relative w-full h-full rounded-[2px] bg-emerald-600 text-white border-2 border-emerald-500 shadow-sm flex flex-col items-center justify-center p-[1px] transition-all duration-150 cursor-pointer z-10 ring-2 ring-emerald-400/80 ring-offset-1 hover:ring-offset-2 hover:scale-115 hover:bg-emerald-700 ${
                     isMatch ? "" : "opacity-30"
                   }`}
@@ -364,7 +364,7 @@ export function SingleScreenWall({
                   </span>
                   <Plus className="w-2.5 h-2.5 text-white stroke-[3]" />
                   <span className="font-mono text-[7px] font-black text-white leading-none">
-                    ${slot.pricePaid}
+                    {slot.pricePaid === 0 ? "FREE" : `$${slot.pricePaid}`}
                   </span>
                 </button>
               );
@@ -376,7 +376,7 @@ export function SingleScreenWall({
                 key={slot.id}
                 onMouseEnter={() => setHoveredSlot(slot)}
                 onMouseLeave={() => setHoveredSlot(null)}
-                title={`${slot.formattedId}: Future slot ($${slot.pricePaid}.00)`}
+                title={`${slot.formattedId}: Future slot (${slot.pricePaid === 0 ? "Free" : `$${slot.pricePaid}.00`})`}
                 className={`w-full h-full rounded-[1px] bg-white/70 border border-[#e5e3dc] hover:border-stone-400 hover:bg-stone-100/90 flex items-center justify-center transition-colors duration-100 cursor-default ${
                   isMatch ? "" : "opacity-15"
                 }`}

@@ -223,7 +223,11 @@ export function ClaimDrawer({
                 </span>
               </div>
               <p className="text-xs text-stone-500 font-mono mt-1">
-                One-time fee: <strong>${price}.00 USD</strong> (No subscriptions)
+                {price === 0 ? (
+                  <span className="text-emerald-700 font-bold">Genesis Tier · 100% Free ($0.00)</span>
+                ) : (
+                  <>One-time fee: <strong>${price}.00 USD</strong> (No subscriptions)</>
+                )}
               </p>
             </div>
             <button
@@ -474,7 +478,9 @@ export function ClaimDrawer({
                   </div>
                   <div className="flex justify-between pb-2 border-b border-[#dad7d0]/60">
                     <span className="text-stone-400">ONE-TIME FEE</span>
-                    <span className="font-bold text-emerald-700">${price}.00 USD (No recurring fee)</span>
+                    <span className="font-bold text-emerald-700">
+                      {price === 0 ? "FREE ($0.00 Genesis Tier)" : `$${price}.00 USD (No recurring fee)`}
+                    </span>
                   </div>
                   <div className="pb-2 border-b border-[#dad7d0]/60">
                     <span className="text-stone-400 block mb-0.5">WEBSITE URL</span>
@@ -591,7 +597,9 @@ export function ClaimDrawer({
                   <span>Registering Slot {formattedId}...</span>
                 ) : (
                   <>
-                    <span>Confirm & Pay (${price}.00)</span>
+                    <span>
+                      {price === 0 ? `Mint Free Genesis Slot (${formattedId})` : `Confirm & Pay ($${price}.00)`}
+                    </span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -600,7 +608,11 @@ export function ClaimDrawer({
 
             <div className="mt-2.5 text-center text-[10px] font-mono text-stone-400 flex items-center justify-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>One payment · No subscriptions · Standard moderation review</span>
+              <span>
+                {price === 0
+                  ? "100% Free · No payment required · Permanent dofollow indexing"
+                  : "One payment · No subscriptions · Standard moderation review"}
+              </span>
             </div>
           </div>
         )}

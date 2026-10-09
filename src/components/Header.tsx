@@ -94,15 +94,31 @@ export function Header({
             <span className="font-bold text-[#080503]">500 / 500 Claimed · Wall Sealed</span>
           ) : (
             <>
-              <strong className="text-[#080503]">{editorialCount}</strong> editorial
-              {paidCount > 0 && (
+              {editorialCount > 0 ? (
                 <>
+                  <strong className="text-[#080503]">{editorialCount}</strong> editorial
+                  {paidCount > 0 && (
+                    <>
+                      <span className="text-stone-300">·</span>
+                      <strong className="text-[#080503]">{paidCount}</strong> public
+                    </>
+                  )}
                   <span className="text-stone-300">·</span>
-                  <strong className="text-[#080503]">{paidCount}</strong> public
+                  <span>{remainingCount} remaining</span>
+                </>
+              ) : (
+                <>
+                  <strong className="text-[#080503]">{claimedCount}</strong> claimed
+                  <span className="text-stone-300">·</span>
+                  <span>{remainingCount} remaining</span>
+                  {nextSlotPrice === 0 && (
+                    <>
+                      <span className="text-stone-300">·</span>
+                      <span className="text-emerald-700 font-bold">Tier 1: Free ($0.00)</span>
+                    </>
+                  )}
                 </>
               )}
-              <span className="text-stone-300">·</span>
-              <span>{remainingCount} remaining</span>
             </>
           )}
         </div>
@@ -121,7 +137,9 @@ export function Header({
             <span>Sold Out</span>
           ) : (
             <>
-              <span>Claim #{nextSlotId} · ${nextSlotPrice}</span>
+              <span>
+                Claim #{nextSlotId} · {nextSlotPrice === 0 ? "FREE ($0)" : `$${nextSlotPrice}`}
+              </span>
               <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </>
           )}

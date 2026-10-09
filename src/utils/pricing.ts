@@ -8,7 +8,7 @@ export const PRICING_TIERS: PricingTier[] = [
     slotRange: [1, 10],
     price: 0,
     description: "Genesis Pioneers. 10 spots for defining builders.",
-    status: "COMPLETED",
+    status: "ACTIVE",
   },
   {
     tierNumber: 2,
@@ -17,7 +17,7 @@ export const PRICING_TIERS: PricingTier[] = [
     slotRange: [11, 25],
     price: 2,
     description: "Impulse Gateway. Accessible entry before bonding inflection.",
-    status: "ACTIVE",
+    status: "UPCOMING",
   },
   {
     tierNumber: 3,

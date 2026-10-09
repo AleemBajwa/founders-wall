@@ -112,10 +112,10 @@ export function getAllSlotsAuthoritative(): AuthoritativeInventory {
     return override || base;
   });
 
-  const editorialCount = 13;
-  const paidClaims = merged.filter((s) => s.isClaimed && !s.isEditorialExample);
+  const editorialCount = 0;
+  const paidClaims = merged.filter((s) => s.isClaimed);
   const paidCount = paidClaims.length;
-  const claimedCount = editorialCount + paidCount;
+  const claimedCount = paidCount;
   const remainingCount = 500 - claimedCount;
 
   // Find authoritative first unclaimed slot
@@ -236,11 +236,7 @@ export function claimSlotAuthoritative(
     );
   }
 
-  if (slotIdToClaim <= 13) {
-    throw new Error(`Slots #001 through #013 are protected complimentary genesis positions.`);
-  }
-
-  if (slotIdToClaim > 500) {
+  if (slotIdToClaim < 1 || slotIdToClaim > 500) {
     throw new Error("Invalid slot position. Must be between 1 and 500.");
   }
 
@@ -270,7 +266,10 @@ export function claimSlotAuthoritative(
     claimedAt: new Date().toISOString(),
     moderationStatus: "approved",
     transactionId: `tx_fw_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
-    paymentReference: `pay_sandbox_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    paymentReference:
+      price === 0
+        ? `genesis_free_mint_${Date.now()}`
+        : `pay_sandbox_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
   };
 
   const updatedClaims = [...existingClaims, newSlot];

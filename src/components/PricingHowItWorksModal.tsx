@@ -193,7 +193,9 @@ export function PricingHowItWorksModal({
             <span>Wall Sealed · All 500 Slots Claimed</span>
           ) : (
             <>
-              <span>Claim Active Slot (#{nextSlotId} · ${nextSlotPrice}.00)</span>
+              <span>
+                Claim Active Slot (#{nextSlotId} · {nextSlotPrice === 0 ? "FREE" : `$${nextSlotPrice}.00`})
+              </span>
               <ArrowRight className="w-4 h-4" />
             </>
           )}

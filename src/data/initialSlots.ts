@@ -214,27 +214,20 @@ export const STITCH_SEEDED_SLOTS: Slot[] = [
 ];
 
 export function generateAllSlots(): Slot[] {
-  const slots: Slot[] = [...STITCH_SEEDED_SLOTS];
+  const slots: Slot[] = [];
 
-  // Slot 14 is the ACTIVE 1st OPEN PUBLIC SALE SLOT
-  slots.push({
-    id: 14,
-    formattedId: "#014",
-    isClaimed: false,
-    isActiveNext: true,
-    pricePaid: 2,
-    tierLabel: "Tier 2 • $2.00",
-  });
-
-  // Slots 15 to 500 are upcoming locked slots
-  for (let i = 15; i <= 500; i++) {
+  for (let i = 1; i <= 500; i++) {
+    const price = getSlotPrice(i);
     slots.push({
       id: i,
       formattedId: formatSlotId(i),
       isClaimed: false,
-      isActiveNext: false,
-      pricePaid: getSlotPrice(i),
-      tierLabel: `Tier ${getSlotPrice(i) <= 2 ? 2 : getSlotPrice(i) <= 5 ? 3 : getSlotPrice(i) <= 10 ? 4 : getSlotPrice(i) <= 20 ? 5 : 6} • $${getSlotPrice(i)}.00`,
+      isActiveNext: i === 1,
+      pricePaid: price,
+      tierLabel:
+        price === 0
+          ? "Tier 1 • Free ($0.00)"
+          : `Tier ${price <= 2 ? 2 : price <= 5 ? 3 : price <= 10 ? 4 : price <= 20 ? 5 : 6} • $${price}.00`,
     });
   }
 

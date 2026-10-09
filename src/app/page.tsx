@@ -126,11 +126,11 @@ export default function Home() {
   }, [nextSlotId]);
 
   const isSoldOut = nextSlotId === null;
-  const editorialCount = 13;
-  const paidCount = useMemo(() => {
-    return slots.filter((s) => s.isClaimed && !s.isEditorialExample).length;
+  const editorialCount = 0;
+  const claimedCount = useMemo(() => {
+    return slots.filter((s) => s.isClaimed).length;
   }, [slots]);
-  const claimedCount = editorialCount + paidCount;
+  const paidCount = claimedCount;
 
   const handleOpenClaim = (slotId?: number | null) => {
     if (isSoldOut || !nextSlotId) return;
