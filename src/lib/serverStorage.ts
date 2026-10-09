@@ -149,6 +149,65 @@ async function saveServerClaim(newClaim: Slot): Promise<Slot[]> {
   return updated;
 }
 
+/**
+ * Deletes a claim by slot ID (or resets all claims if slotId is not provided).
+ */
+export async function deleteClaimAuthoritative(slotId?: number): Promise<{ success: boolean; deletedSlotId?: number; resetAll?: boolean }> {
+  const sql = getDb();
+
+  if (sql) {
+    try {
+      await ensureTable(sql);
+      if (typeof slotId === "number") {
+        await sql`DELETE FROM claims WHERE id = ${slotId};`;
+      } else {
+        await sql`TRUNCATE TABLE claims;`;
+      }
+    } catch (err) {
+      console.error("Error deleting claim from Postgres:", err);
+      throw new Error("Failed to delete claim from database.");
+    }
+  }
+
+  // Update memory cache
+  if (typeof slotId === "number") {
+    if (memoryClaimsCache) {
+      memoryClaimsCache = memoryClaimsCache.filter((c) => c.id !== slotId);
+    }
+  } else {
+    memoryClaimsCache = [];
+  }
+
+  // Update local files if present
+  try {
+    if (fs.existsSync(LOCAL_CLAIMS_FILE)) {
+      const raw = fs.readFileSync(LOCAL_CLAIMS_FILE, "utf-8");
+      const list = JSON.parse(raw);
+      const filtered = typeof slotId === "number" ? list.filter((c: any) => c.id !== slotId) : [];
+      fs.writeFileSync(LOCAL_CLAIMS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
+    }
+  } catch (err) {
+    // Ignore local file errors
+  }
+
+  try {
+    if (fs.existsSync(TMP_CLAIMS_FILE)) {
+      const raw = fs.readFileSync(TMP_CLAIMS_FILE, "utf-8");
+      const list = JSON.parse(raw);
+      const filtered = typeof slotId === "number" ? list.filter((c: any) => c.id !== slotId) : [];
+      fs.writeFileSync(TMP_CLAIMS_FILE, JSON.stringify(filtered, null, 2), "utf-8");
+    }
+  } catch (err) {
+    // Ignore tmp file errors
+  }
+
+  return {
+    success: true,
+    deletedSlotId: slotId,
+    resetAll: slotId === undefined,
+  };
+}
+
 export interface AuthoritativeInventory {
   slots: Slot[];
   nextSlotId: number | null;
