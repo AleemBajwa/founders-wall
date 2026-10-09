@@ -289,6 +289,13 @@ export function ClaimDrawer({
 
                 {/* Form */}
                 <form id="claim-form" onSubmit={handleProceedToReview} className="space-y-4">
+                  {apiError && (
+                    <div className="p-3 bg-red-50 border border-red-300 text-red-900 text-xs font-mono flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-700 shrink-0 mt-0.5" />
+                      <span>{apiError}</span>
+                    </div>
+                  )}
+
                   {/* 1. Project Name */}
                   <div>
                     <label htmlFor="field-project-name" className="block text-[11px] font-mono text-stone-700 font-bold mb-1">
@@ -301,6 +308,22 @@ export function ClaimDrawer({
                       placeholder="e.g. Typeflow"
                       value={formData.projectName}
                       onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-none border border-[#dad7d0] bg-white font-mono text-[#080503] focus:outline-none focus:border-[#080503]"
+                    />
+                  </div>
+
+                  {/* 2. Founder Name */}
+                  <div>
+                    <label htmlFor="field-founder-name" className="block text-[11px] font-mono text-stone-700 font-bold mb-1">
+                      Founder Name *
+                    </label>
+                    <input
+                      id="field-founder-name"
+                      type="text"
+                      required
+                      placeholder="e.g. Sarah Miller"
+                      value={formData.founderName}
+                      onChange={(e) => setFormData({ ...formData, founderName: e.target.value })}
                       className="w-full px-3 py-2 text-xs rounded-none border border-[#dad7d0] bg-white font-mono text-[#080503] focus:outline-none focus:border-[#080503]"
                     />
                   </div>
