@@ -167,37 +167,103 @@ export function SingleScreenWall({
             <span className="opacity-50 text-[10px] ml-1">({tab.count})</span>
           </button>
         ))}
+        {matchResult.isFiltering && (
+          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#080503] text-[#fafaf9] text-[11px] font-mono shadow-xs shrink-0 animate-in fade-in duration-150">
+            <span>
+              {matchResult.count > 0 ? `${matchResult.count} matching` : "No matches"}
+            </span>
+            <button
+              onClick={() => {
+                onSelectCategory("All");
+                onClearSearch();
+              }}
+              className="p-0.5 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
+              aria-label="Clear filter"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Exploration Guidance & Quick Directory Bar */}
-      <div className="shrink-0 w-full max-w-full mb-1 px-2.5 py-1 rounded bg-[#f4f2ec] border border-[#dedad0] flex items-center justify-between gap-2 text-xs font-mono shadow-2xs z-20">
-        <div className="flex items-center gap-2 min-w-0">
+      {/* Exploration Guidance & Dedicated Slot Inspector Bar (Never covers grid) */}
+      <div className="shrink-0 w-full max-w-full mb-1 px-2.5 py-1 rounded bg-[#f4f2ec] border border-[#dedad0] flex items-center justify-between gap-2 text-xs font-mono shadow-2xs z-20 transition-colors">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <span className="relative flex h-2 w-2 shrink-0">
             <span
               className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                nextSlotId === null ? "bg-amber-400" : "bg-emerald-400"
+                hoveredSlot
+                  ? hoveredSlot.isClaimed
+                    ? "bg-amber-400"
+                    : hoveredSlot.id === nextSlotId
+                    ? "bg-emerald-400"
+                    : "bg-stone-400"
+                  : nextSlotId === null
+                  ? "bg-amber-400"
+                  : "bg-emerald-400"
               }`}
             />
             <span
               className={`relative inline-flex rounded-full h-2 w-2 ${
-                nextSlotId === null ? "bg-amber-500" : "bg-emerald-500"
+                hoveredSlot
+                  ? hoveredSlot.isClaimed
+                    ? "bg-amber-500"
+                    : hoveredSlot.id === nextSlotId
+                    ? "bg-emerald-500"
+                    : "bg-stone-500"
+                  : nextSlotId === null
+                  ? "bg-amber-500"
+                  : "bg-emerald-500"
               }`}
             />
           </span>
-          <span className="text-[#080503] font-bold shrink-0">Guide:</span>
-          {nextSlotId === null ? (
-            <span className="text-stone-700 font-bold truncate">
-              The Founders Wall is sealed · All 500 slots claimed
-            </span>
+
+          {hoveredSlot ? (
+            <div className="flex items-center gap-2 min-w-0 truncate">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#080503] text-[#fafaf9] shrink-0">
+                {hoveredSlot.formattedId}
+              </span>
+              {hoveredSlot.isClaimed ? (
+                <div className="flex items-center gap-1.5 min-w-0 truncate">
+                  <span className="font-bold text-[#080503] truncate">
+                    {hoveredSlot.projectName}
+                  </span>
+                  <span className="text-stone-500 text-[11px] shrink-0">
+                    ({hoveredSlot.category})
+                  </span>
+                  <span className="text-stone-400 hidden md:inline">·</span>
+                  <span className="text-stone-600 truncate hidden md:inline text-[11px]">
+                    {hoveredSlot.oneLiner || "Click to inspect founder & project details"}
+                  </span>
+                </div>
+              ) : nextSlotId !== null && hoveredSlot.id === nextSlotId ? (
+                <span className="text-emerald-700 font-bold truncate">
+                  Open for Claim · ${nextSlotPrice}.00 · Click to claim now
+                </span>
+              ) : (
+                <span className="text-stone-600 truncate">
+                  Future slot · {getCurrentTier(hoveredSlot.id).code} (${hoveredSlot.pricePaid}.00) · Sequential release
+                </span>
+              )}
+            </div>
           ) : (
-            <>
-              <span className="text-stone-600 truncate hidden sm:inline">
-                Click any logo to inspect · 13 editorial examples · Slot #{nextSlotId} is active at ${nextSlotPrice}
-              </span>
-              <span className="text-stone-600 truncate sm:hidden">
-                Tap logo to inspect · Slot #{nextSlotId} active (${nextSlotPrice})
-              </span>
-            </>
+            <div className="flex items-center gap-2 min-w-0 truncate">
+              <span className="text-[#080503] font-bold shrink-0">Guide:</span>
+              {nextSlotId === null ? (
+                <span className="text-stone-700 font-bold truncate">
+                  The Founders Wall is sealed · All 500 slots claimed
+                </span>
+              ) : (
+                <>
+                  <span className="text-stone-600 truncate hidden sm:inline">
+                    Hover any logo or slot to inspect · 13 editorial examples · Slot #{nextSlotId} is active at ${nextSlotPrice}
+                  </span>
+                  <span className="text-stone-600 truncate sm:hidden">
+                    Tap to inspect · Slot #{nextSlotId} active (${nextSlotPrice})
+                  </span>
+                </>
+              )}
+            </div>
           )}
         </div>
 
@@ -211,47 +277,6 @@ export function SingleScreenWall({
           </button>
         )}
       </div>
-
-      {/* Filter Status Badge */}
-      {matchResult.isFiltering && (
-        <div className="absolute top-16 z-30 flex items-center gap-2 px-3 py-1 rounded-full bg-[#080503] text-[#fafaf9] text-xs font-mono shadow-md animate-in fade-in duration-150">
-          {matchResult.count > 0 ? (
-            <span>Found {matchResult.count} matching project{matchResult.count === 1 ? "" : "s"}</span>
-          ) : (
-            <span className="text-amber-300">No matching projects found</span>
-          )}
-          <button
-            onClick={() => {
-              onSelectCategory("All");
-              onClearSearch();
-            }}
-            className="p-0.5 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
-            aria-label="Clear filter"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-
-      {/* Floating Hover Tooltip */}
-      {hoveredSlot && (
-        <div className="absolute top-16 right-4 z-30 pointer-events-none hidden md:flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#080503] text-[#fafaf9] text-xs font-mono shadow-md border border-stone-700">
-          <span className="font-bold text-amber-300">{hoveredSlot.formattedId}</span>
-          <span className="text-stone-400">·</span>
-          {hoveredSlot.isClaimed ? (
-            <>
-              <span className="font-bold">{hoveredSlot.projectName}</span>
-              <span className="text-stone-400 text-[10px]">({hoveredSlot.category})</span>
-            </>
-          ) : nextSlotId !== null && hoveredSlot.id === nextSlotId ? (
-            <span className="text-emerald-400 font-bold">Open for Claim · ${nextSlotPrice}.00</span>
-          ) : (
-            <span className="text-stone-300">
-              Future slot · {getCurrentTier(hoveredSlot.id).code} (${hoveredSlot.pricePaid}.00) · Sequential release
-            </span>
-          )}
-        </div>
-      )}
 
       {/* Interactive 500-Slot Mosaic Canvas (Expanded to Entire Page Width) */}
       <div
