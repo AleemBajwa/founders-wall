@@ -66,11 +66,43 @@ export default function Home() {
           setSelectedSlotForDetails(target);
         } else if (target && target.id === 14) {
           setTargetSlotForClaim(14);
-          setClaimDrawerOpen(true);
         }
       }
     }
   }, [slots]);
+
+  // Handle Stripe Checkout return (?session_id=cs_test_...)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+    if (!sessionId) return;
+
+    async function verifyStripeSession() {
+      try {
+        const res = await fetch(`/api/checkout/verify?session_id=${sessionId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.slot) {
+            setSlots((prev) =>
+              prev.map((s) => (s.id === data.slot.id ? data.slot : s))
+            );
+            setSelectedSlotForDetails(data.slot);
+            try {
+              const confetti = (await import("canvas-confetti")).default;
+              confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+            } catch {}
+          }
+        }
+      } catch (e) {
+        console.error("Failed to verify checkout session:", e);
+      } finally {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    }
+
+    verifyStripeSession();
+  }, []);
 
   // Sync active slot deep-link to URL
   const handleOpenDetails = (slot: Slot) => {

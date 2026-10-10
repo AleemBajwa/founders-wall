@@ -140,6 +140,40 @@ export function ClaimDrawer({
     setApiError("");
 
     try {
+      // 1. If Paid Tier ($2 - $40), route through Stripe Checkout
+      if (price > 0) {
+        const checkoutRes = await fetch("/api/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            formData: {
+              ...formData,
+              projectName: formData.projectName.trim(),
+              founderName: formData.founderName.trim(),
+              founderHandle: formData.founderHandle ? formData.founderHandle.trim() : "",
+              oneLiner: formData.oneLiner.trim(),
+              projectUrl: formData.projectUrl.trim(),
+            },
+            targetSlotId: slotId,
+          }),
+        });
+
+        const checkoutData = await checkoutRes.json();
+        if (!checkoutRes.ok) {
+          setApiError(checkoutData.error || "Failed to initialize payment gateway.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        if (checkoutData.url) {
+          window.location.href = checkoutData.url;
+          return;
+        }
+      }
+
+      // 2. Genesis Free Tier ($0.00): Direct instantaneous mint
       const res = await fetch("/api/claim", {
         method: "POST",
         headers: {
@@ -617,11 +651,13 @@ export function ClaimDrawer({
                 className="w-full py-3.5 px-4 rounded-full bg-[#080503] hover:bg-[#080503]/85 active:scale-95 text-[#fafaf9] font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-xs"
               >
                 {isSubmitting ? (
-                  <span>Registering Slot {formattedId}...</span>
+                  <span>
+                    {price === 0 ? `Registering Slot ${formattedId}...` : "Redirecting to Stripe Checkout..."}
+                  </span>
                 ) : (
                   <>
                     <span>
-                      {price === 0 ? `Mint Free Genesis Slot (${formattedId})` : `Confirm & Pay ($${price}.00)`}
+                      {price === 0 ? `Mint Free Genesis Slot (${formattedId})` : `Pay $${price}.00 USD via Stripe`}
                     </span>
                     <ArrowRight className="w-4 h-4" />
                   </>

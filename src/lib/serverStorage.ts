@@ -341,9 +341,25 @@ function validateClaimInput(data: ClaimFormData): void {
  */
 export async function claimSlotAuthoritative(
   data: ClaimFormData,
-  targetSlotId?: number
+  targetSlotId?: number,
+  customPaymentRef?: string
 ): Promise<{ success: boolean; slot: Slot; inventory: AuthoritativeInventory }> {
   validateClaimInput(data);
+
+  const existingClaims = await getServerClaims();
+
+  // Idempotency: If this paymentReference was already minted, return existing slot
+  if (customPaymentRef) {
+    const alreadyMinted = existingClaims.find((c) => c.paymentReference === customPaymentRef);
+    if (alreadyMinted) {
+      const currentInv = await getAllSlotsAuthoritative();
+      return {
+        success: true,
+        slot: alreadyMinted,
+        inventory: currentInv,
+      };
+    }
+  }
 
   const inventory = await getAllSlotsAuthoritative();
 
@@ -351,9 +367,12 @@ export async function claimSlotAuthoritative(
     throw new Error("The Founders Wall is completely filled. No positions remain available.");
   }
 
-  const slotIdToClaim = targetSlotId ?? inventory.nextSlotId;
+  // If targetSlotId was already claimed in a race, fallback to current nextSlotId
+  let slotIdToClaim = targetSlotId ?? inventory.nextSlotId;
+  if (existingClaims.some((c) => c.id === slotIdToClaim)) {
+    slotIdToClaim = inventory.nextSlotId;
+  }
 
-  // Strict check: Only the active next slot can be claimed
   if (slotIdToClaim !== inventory.nextSlotId) {
     throw new Error(
       `Slot #${slotIdToClaim} cannot be claimed. The active next slot available for claim is #${inventory.nextSlotId}.`
@@ -364,7 +383,6 @@ export async function claimSlotAuthoritative(
     throw new Error("Invalid slot position. Must be between 1 and 500.");
   }
 
-  const existingClaims = await getServerClaims();
   if (existingClaims.some((c) => c.id === slotIdToClaim)) {
     throw new Error(`Slot #${slotIdToClaim} has already been claimed by another builder.`);
   }
@@ -391,9 +409,10 @@ export async function claimSlotAuthoritative(
     moderationStatus: "approved",
     transactionId: `tx_fw_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
     paymentReference:
-      price === 0
+      customPaymentRef ||
+      (price === 0
         ? `genesis_free_mint_${Date.now()}`
-        : `pay_sandbox_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        : `pay_sandbox_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`),
   };
 
   await saveServerClaim(newSlot);
